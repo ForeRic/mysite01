@@ -1,12 +1,12 @@
 {% extends '../base.html %} <!-- 한칸 위 디렉토리로 올라갈때는 ../ 이고 현재위치는 .(점) -->
-
+{% load mathfilters %}
 {% block css_link %}
 <link href="/assets/css/guestbook.css" rel="stylesheet" type="text/css">
 {% endblock %}
 
 		{% block content %}
 			<div id="guestbook">
-				<form action="/guestbook" method="post">
+				<form action="/guestbook/add" method="post"> {% csrf_token %}
 					<input type="hidden" name="a" value="insert">
 					<table>
 						<tr>
@@ -17,23 +17,23 @@
 							<td colspan=4><textarea name="content" id="content"></textarea></td>
 						</tr>
 						<tr>
-							<td colspan=4 align=right><input type="submit" VALUE=" 확인 "></td>
+							<td colspan=4 align=right><input type="submit" VALUE=" 등록 "></td>
 						</tr>
 					</table>
 				</form>
 				<ul>
 					<li>
-					{% for guestbook in guestbooklist %}
+					{% for guestbook in guestbook_list %}
 						<table>
 							<tr>
-								<td>{{guestbook.no }}</td>
+								<td>{{ guestbook_list | length | sub:forloop.counter | add:1 }}</td>
 								<td>{{guestbook.name}}</td>
-								<td>{{guestbook.regdate}}</td>
-								<td><a href="/guestbook/deleteform?no={{ guestbook.no}}">삭제</a></td>
+								<td>{{guestbook.reg_date}}</td>
+								<td><a href="/guestbook/deleteform?no={{ guestbook.no }}">삭제</a></td>
 							</tr>
 							<tr>
 								<td colspan=4>
-									{{guestbook.content}}
+									{{ guestbook.message | linebreaksbr }}
 								</td>
 							</tr>
 						</table>
@@ -42,4 +42,4 @@
 					</li>
 				</ul>
 			</div>
-		{ % endblock %}
+		{% endblock %}
