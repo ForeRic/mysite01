@@ -6,10 +6,10 @@ from user import models
 
 
 def joinform(request):
-    return render(request,'user/joinform.html')
+    return render(request, 'user/joinform.html')
 
 def joinsuccess(request):
-    return render(request,'user/joinsuccess.html')
+    return render(request, 'user/joinsuccess.html')
 
 def join(request):
     name = request.POST['name']
@@ -48,7 +48,13 @@ def updateform(request):
 
     authuser = request.session["authuser"]
     result = models.findbyno(authuser["no"])
-    return render(request, 'user/updateform.html')
+    return render(request, 'user/updateform.html', result)
 
 def update(request):
-    pass
+    name = request.POST['name']
+    password = request.POST['password']
+    gender = request.POST['gender']
+
+    models.update(name, password, gender)
+    return HttpResponseRedirect('/')
+
