@@ -31,7 +31,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'board',
     'user',
+    'mathfilters',
     'main',
     'guestbook',
     'django.contrib.auth',
@@ -134,3 +136,5 @@ STATIC_URL = '/assets/'
 # session cookies(csrftoken) stored in memory
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+APPEND_SLASH=False
