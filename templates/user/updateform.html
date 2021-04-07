@@ -7,14 +7,13 @@
 {% block content %}
 			<div id="user">
 
-				<form id="join-form" name="joinForm" method="post" action="/user/join">
+				<form id="join-form" name="joinForm" method="post" action="/user/update">
 					{% csrf_token %}
 					<label class="block-label" for="name">이름</label>
-					<input id="name" name="name" type="text" value="">
+					<input id="name" name="name" type="text" value="{{ request.session.authuser.name }}">
 
 					<label class="block-label">이메일</label>
-					<input id="email" name="email" type="text" value="">
-					<input type="button" value="중복체크">
+					<h4>{{ request.GET.email }}</h4>
 
 					<label class="block-label">패스워드</label>
 					<input name="password" type="password" value="">
@@ -26,8 +25,8 @@
 					</fieldset>
 
 
-					<input type="submit" value="fix하기">
+					<input type="submit" value="수정하기">
 
 				</form>
 			</div>
-{ % endblock %}
+{% endblock %}
