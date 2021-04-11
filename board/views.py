@@ -1,4 +1,5 @@
-# 참조 + 참조 및 짜집기..
+'''
+# 참조 + 참조 및 짜집기..(글목록 안보임.. 서버는 잘 돌아감..) --> 참조 + 분석및 공부용
 from math import ceil
 
 from django.http import HttpResponse, HttpResponseRedirect
@@ -238,3 +239,141 @@ def reply(request):
         return HttpResponse('Error')
 
     return HttpResponseRedirect('/board')
+'''
+
+from math import ceil
+
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
+
+from board import models
+
+LIST_COUNT = 10
+
+
+def index(request):
+   # page = request.GET.get("p")
+    #page = 1 if page is None else int(page)
+
+    #print(page)
+
+    # totalcount = models.count()
+    # boardlist = models.findall(page, LIST_COUNT)
+
+    # paging 정보를 계산
+    # pagecount = ceil(totalcount / LIST_COUNT)
+    #
+    # data = {
+    #     "boardlist": boardlist,
+    #     'pagecount': pagecount,
+    #     'netpage': 7,
+    #     'prvpage': 5,
+    #     'curpage': 2
+    #
+    # }
+
+    #indx = (page - 1) * LIST_COUNT
+
+    '''
+    totalcount = models.count()  # 전체 게시글 갯수 세는 작업
+    pagecount = ceil( totalcount / LIST_COUNT)
+    # ceil : 무조건 올림. (반올림 반내림 따위 하지 않음)
+    # 예) 33개 게시물/10개씩 보여줘라: 페이지 3.3페이지 이므로 총 페이지 4개 나오도록 몫을 3이 아닌 4가 되게 함.
+    curpage = page
+    nextpage = curpage + 1 if curpage < pagecount else curpage
+    prvpage = 1 if (curpage - 1) < 1 else (curpage - 1)
+
+    # 게시판에서 페이지당 몇개의 글을 보여줄지 정하는 모듈
+    paginator = {
+        'pagecount': pagecount,
+        'nextpage': nextpage,
+        'prevpage': prvpage,
+        'curpage': curpage,
+        'paging': range(1, 6)
+    }
+    '''
+    results = models.boardlist()
+    data = {'boardlist': results}
+
+    return render(request, 'board/index.html', data)
+
+
+def view(request):
+
+    boardno = request.GET["no"]
+    oneboard = models.getboard(boardno)
+    data = {'oneboard': oneboard}
+    return render(request, 'board/view.html', data)
+
+
+def writeform(request):
+    return render(request, 'board/writeform.html')
+
+
+def write(request):
+
+    title = request.POST["title"]
+    content = request.POST["content"]
+    userno = request.session["authuser"]["no"]
+    models.insert(title, content, userno)
+
+    return HttpResponseRedirect('/board')
+
+
+def updateform(request):
+
+    boardno = request.GET["no"]
+    oneboard = models.getboard(boardno)
+    data = {"oneBoard": oneboard}
+
+    return render(request, 'board/updateform.html', data)
+
+
+def update(request):
+
+    boardno = request.POST["boardno"]
+    title = request.POST["title"]
+    content = request.POST["content"]
+    models.update(title, content, boardno)
+
+    return HttpResponseRedirect(f'/board/view?no={boardno}')
+
+
+def delete(request):
+
+    boardno = request.GET["no"]
+    models.delete(boardno)
+
+    return HttpResponseRedirect('/board')
+
+
+def replyform(request):
+    return render(request, 'board/replyform.html')
+
+
+def reply(request):
+
+    originalboardno = request.POST["originalboardno"]
+    originalboard = models.getboard(originalboardno)
+    original_g_no = originalboard["g_no"]
+    original_o_no = originalboard["o_no"]
+    originaldepth = originalboard["depth"]
+    models.updatereply(original_g_no, original_o_no)
+
+    title = request.POST["title"]
+    content = request.POST["content"]
+    userno = request.session["authuser"]["no"]
+    models.insertreply(title, content, original_g_no, original_o_no, originaldepth, userno)
+
+    return HttpResponseRedirect('/board')
+
+
+def search(request):
+
+    keyword = request.POST["kwd"]
+    boardserach = models.search(keyword)
+    data = {'boardlist': boardserach}
+
+    return render(request, 'board/index.html', data)
+
+

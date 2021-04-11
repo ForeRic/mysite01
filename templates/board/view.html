@@ -12,13 +12,13 @@
 					</tr>
 					<tr>
 						<td class="label">제목</td>
-						<td>{{post.title}}</td>
+						<td>{{oneboard.title}}</td>
 					</tr>
 					<tr>
 						<td class="label">내용</td>
 						<td>
 							<div class="view-content">
-								{{ post.contents | linebreaksbr }}
+								{{ oneboard.contents | linebreaksbr }}
 							</div>
 						</td>
 					</tr>
@@ -26,11 +26,11 @@
 				<div class="bottom">
 					<a href="/board">글목록</a>
 					{% if request.session.authuser is not None and post.user_no == request.session.authuser.no %}
-						<a href="/board/updateform?no={{post.no}}">글수정</a>
+						<a href="/board/updateform?no={{ oneboard.no }}">글수정</a>
 					{% endif %}
 
 					{% if request.session.authuser is not None %}
-						<a href="/board/replyform?no={{ post.no }}">답글</a>
+						<a href="/board/replyform?no={{ oneboard.no }}">답글</a>
 					{% endif %}
 				</div>
 			</div>

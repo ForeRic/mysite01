@@ -9,7 +9,7 @@
 			<div id="board">
 				<form id="search_form" action="/board" method="post">
 					{% csrf_token %}
-					<input type="text" id="kwd" name="kwd" value="{{ kwd }}">
+					<input type="text" id="kwd" name="kwd" value="">
 					<input type="submit" value="찾기">
 				</form>
 				<table class="tbl-ex">
@@ -21,22 +21,22 @@
 						<th>작성일</th>
 						<th>&nbsp;</th>
 					</tr>				
-					{% for board in post %}
+					{% for oneboard in boardlist %}
 					<tr>
-						<td>{{ post | length  }}</td> <!-- | sub: forloop.counter | add:1 -->
-						<td style="text-align:left; padding-left:{{30|mul:board.depth}}px">
-							{% if board.depth > 0 %}
+						<td>{{ oneboard.no }}</td> <!-- | sub: forloop.counter | add:1 -->
+						<td style="text-align:left; padding-left:{{30|mul:oneboard.depth}}px">
+							{% if oneboard.depth > 0 %}
 								<img src="/assets/images/reply.png" width = 20px; height=20px>
 							{% endif %}
-							<a href="/board/view?no={{board.no}}"> {{board.title}}</a>
+							<a href="/board/view?no={{ onboard.no }}"> {{oneboard.title}}</a>
 						</td>
-						<td>{{board.author}}</td>
-						<td>{{board.hit}}</td>
-						<td>{{board.reg_rate }}</td> <!-- | date: 'Y-m-d H:i:s' -->
+						<td>{{oneboard.name}}</td>
+						<td>{{oneboard.hit}}</td>
+						<td>{{oneboard.reg_rate }}</td> <!-- | date: 'Y-m-d H:i:s' -->
 						<td>
 							{% if request.seesion.authuser is not None %}
-								{% if board.user_no == request.session.authuser.no %}
-									<a href="/board/delete?no={{board.no}}" class="del">삭제</a>
+								{% if oneboard.no == request.session.authuser.no %}
+									<a href="/board/delete?no={{ oneboard.no }}" class="del">삭제</a>
 								{% endif %}
 							{% endif %}
 						</td>
@@ -66,7 +66,7 @@
 				<!-- pager 추가 -->
 				
 				<div class="bottom">
-					{% if reqeust.session.authuser is not None %}
+					{% if reqeust.session.authuser.no is not None %}
 						<a href="/board" id="new-book">글쓰기</a>
 					{% endif %}
 				</div>				

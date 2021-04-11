@@ -47,6 +47,7 @@ urlpatterns = [
     path('board/delete/', boardviews.delete),
     path('board/replyform', boardviews.replyform),
     path('board/reply', boardviews.reply),
+    path('board/search', boardviews.search),
 
 
 ]
