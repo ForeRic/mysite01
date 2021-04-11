@@ -1,4 +1,4 @@
-{% extends '../base.html %} <!-- 한칸 위 디렉토리로 올라갈때는 ../ 이고 현재위치는 .(점) -->
+{% extends '../base.html' %} <!-- 한칸 위 디렉토리로 올라갈때는 ../ 이고 현재위치는 .(점) -->
 
 {% block css_link %}
 <link href="/assets/css/user.css" rel="stylesheet" type="text/css">
@@ -13,7 +13,7 @@
 					<input id="name" name="name" type="text" value="{{ request.session.authuser.name }}">
 
 					<label class="block-label">이메일</label>
-					<h4>{{ request.GET.email }}</h4>
+					<h4>{{ request.GET.get['email'] }}</h4>
 
 					<label class="block-label">패스워드</label>
 					<input name="password" type="password" value="">

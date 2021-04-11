@@ -1,26 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>mysite</title>
-<meta http-equiv="content-type" content="text/html; charset=utf-8">
+{% extends '../base.html' %}
+{%load mathfilters %}
+
+{% block css_link %}
 <link href="/assets/css/board.css" rel="stylesheet" type="text/css">
-</head>
-<body>
-	<div id="container">
-		<div id="header">
-			<h1>MySite</h1>
-			<ul>
-				<li><a href="">로그인</a><li>
-				<li><a href="">회원가입</a><li>
-				<li><a href="">회원정보수정</a><li>
-				<li><a href="">로그아웃</a><li>
-				<li>님 안녕하세요 ^^;</li>
-			</ul>
-		</div>
-		<div id="content">
+{% endblock %}
+
+{% block content %}
 			<div id="board">
-				<form id="search_form" action="" method="post">
-					<input type="text" id="kwd" name="kwd" value="">
+				<form id="search_form" action="/board" method="post">
+					{% csrf_token %}
+					<input type="text" id="kwd" name="kwd" value="{{ kwd }}">
 					<input type="submit" value="찾기">
 				</form>
 				<table class="tbl-ex">
@@ -32,46 +21,54 @@
 						<th>작성일</th>
 						<th>&nbsp;</th>
 					</tr>				
+					{% for board in post %}
 					<tr>
-						<td>3</td>
-						<td><a href="">세 번째 글입니다.</a></td>
-						<td>안대혁</td>
-						<td>3</td>
-						<td>2015-10-11 12:04:20</td>
-						<td><a href="" class="del">삭제</a></td>
+						<td>{{ post | length  }}</td> <!-- | sub: forloop.counter | add:1 -->
+						<td style="text-align:left; padding-left:{{30|mul:board.depth}}px">
+							{% if board.depth > 0 %}
+								<img src="/assets/images/reply.png" width = 20px; height=20px>
+							{% endif %}
+							<a href="/board/view?no={{board.no}}"> {{board.title}}</a>
+						</td>
+						<td>{{board.author}}</td>
+						<td>{{board.hit}}</td>
+						<td>{{board.reg_rate }}</td> <!-- | date: 'Y-m-d H:i:s' -->
+						<td>
+							{% if request.seesion.authuser is not None %}
+								{% if board.user_no == request.session.authuser.no %}
+									<a href="/board/delete?no={{board.no}}" class="del">삭제</a>
+								{% endif %}
+							{% endif %}
+						</td>
 					</tr>
-					<tr>
-						<td>2</td>
-						<td><a href="">두 번째 글입니다.</a></td>
-						<td>안대혁</td>
-						<td>3</td>
-						<td>2015-10-02 12:04:12</td>
-						<td><a href="" class="del">삭제</a></td>
-					</tr>
-					<tr>
-						<td>1</td>
-						<td><a href="">첫 번째 글입니다.</a></td>
-						<td>안대혁</td>
-						<td>3</td>
-						<td>2015-09-25 07:24:32</td>
-						<td><a href="" class="del">삭제</a></td>
-					</tr>
+					{% endfor %}
+
 				</table>
+
+				<!-- pager 추가 : for 문 돌리기 -->
+				<div class="pager">
+					<ul>
+						<li><a href="/board?p={{paginator.prvpage}} & kwd = {{ keyword }}">◀</a></li>
+						{% for i in paginator.paging %}
+							{% if paginator.curpage == i %}
+								<li class="selected">{{i}}</li>
+							{% elif i > paginator.pagecount %}
+								<li>{{i}}</li>
+							{% else %}
+								<li><a href="/board?p={{i}} & kwd = {{keyword}}">{{i}}</a></li>
+							{% endif %}
+						{% endfor %}
+
+						<li><a href="/board?p={{paginator.nextpage}} & kwd = {{keyword}}">▶</a></li>
+					</ul>
+				</div>
+
+				<!-- pager 추가 -->
+				
 				<div class="bottom">
-					<a href="" id="new-book">글쓰기</a>
+					{% if reqeust.session.authuser is not None %}
+						<a href="/board" id="new-book">글쓰기</a>
+					{% endif %}
 				</div>				
 			</div>
-		</div>
-		<div id="navigation">
-			<ul>
-				<li><a href="">안대혁</a></li>
-				<li><a href="">방명록</a></li>
-				<li><a href="">게시판</a></li>
-			</ul>
-		</div>
-		<div id="footer">
-			<p>(c)opyright 2015, 2016, 2017, 2018</p>
-		</div>
-	</div>
-</body>
-</html>
+{% endblock %}
