@@ -8,8 +8,8 @@ def boardlist():
         cursor = db.cursor(DictCursor)
 
         sql = '''
-          select a.no as ano, 
-                 b.no as bno, 
+          select a.no as b_no, 
+                 b.no as u_no, 
                  title, 
                  name, 
                  hit, 
@@ -84,8 +84,8 @@ def listbyno(no):
         cursor = db.cursor(DictCursor)
 
         sql = '''
-          select a.no as ano,
-                 b.no as bno, 
+          select a.no as b_no,
+                 b.no as u_no, 
                  title, 
                  contents, 
                  name, 
@@ -124,17 +124,17 @@ def deletebyno(no):
         print(f'error: {e}')
 
 
-def findby_no_and_ps(ano, password):
+def findby_no_and_ps(b_no, password):
     try:
         db = conn()
         cursor = db.cursor(DictCursor)
         sql = '''
-        select b.no as bno, name, email, gender
+        select b.no as u_no, name, email, gender
           from board a, user b
          where a.user_no = b.no
            and a.no = %s
            and password = %s'''
-        cursor.execute(sql, (ano, password))
+        cursor.execute(sql, (b_no, password))
 
         result = cursor.fetchone()
 
@@ -146,7 +146,7 @@ def findby_no_and_ps(ano, password):
         print(f'error: {e}')
 
 
-def update(ano, title, contents):
+def update(b_no, title, contents):
     try:
         db = conn()
         cursor = db.cursor()
@@ -155,7 +155,7 @@ def update(ano, title, contents):
         update board
            set title = %s, contents = %s
          where no = %s'''
-        cursor.execute(sql, (title, contents, ano))
+        cursor.execute(sql, (title, contents, b_no))
 
         db.commit()
 
@@ -163,6 +163,30 @@ def update(ano, title, contents):
         db.close()
 
         print("ok")
+    except OperationalError as e:
+        print(f'error: {e}')
+
+
+def count():
+    try:
+        # 연결 및 커서 생성
+        db = conn()
+        cursor = db.cursor(DictCursor)
+
+        # SQL 실행
+        sql = 'select count(*) as count from board'
+        cursor.execute(sql)
+
+        # 결과 받아오기
+        result = cursor.fetchone()
+
+        # 자원 정리
+        cursor.close()
+        db.close()
+
+        # 결과 반환
+        return result
+
     except OperationalError as e:
         print(f'error: {e}')
 

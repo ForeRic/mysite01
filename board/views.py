@@ -1,3 +1,5 @@
+from math import ceil
+
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from board import models
@@ -14,20 +16,27 @@ def index(request):
 
     print(page)
 
-    '''
-    page = request.GET['p']
-    totalcount = models.count()
-    boardlist = models.findall(page, LIST_COUNT)
-    # paging 정보 계산
+    totalcount = models.count()  # 전체 게시글 갯수 세는 작업
     pagecount = ceil(totalcount / LIST_COUNT)
-    data = {
-        "boardlist": boardlist,
-        "pagecount": pagecount,
-        "netpage": 7,
-        "prvpage": 5,
-        "curpage": 2,
+    # ceil : 무조건 올림. (반올림 반내림 따위 하지 않음)
+    # 예) 33개 게시물/10개씩 보여줘라: 페이지 3.3페이지 이므로 총 페이지 4개 나오도록 몫을 3이 아닌 4가 되게 함.
+    curpage = page
+    nextpage = curpage + 1 if curpage < pagecount else curpage
+    prvpage = 1 if (curpage - 1) < 1 else (curpage - 1)
+
+    # 게시판에서 페이지당 몇개의 글을 보여줄지 정하는 모듈
+    paginator = {
+        'pagecount': pagecount,
+        'nextpage': nextpage,
+        'prevpage': prvpage,
+        'curpage': curpage,
+        'paging': range(1, 6)
     }
-    '''
+
+    data = {
+        'boardlist': results,
+        'paginator': paginator
+    }
     return render(request, 'board/index.html', data)
 
 
@@ -77,8 +86,8 @@ def update(request):
     if authuser is None:
         return HttpResponseRedirect('/user/loginform')
 
-    ano = request.POST['post_id']
-    result = models.listbyno(ano)
+    b_no = request.POST['post_id']
+    result = models.listbyno(b_no)
 
     if result['bno'] != authuser['no']:
         return HttpResponseRedirect('/')
@@ -86,8 +95,8 @@ def update(request):
     title = request.POST['title']
     contents = request.POST['contents']
 
-    models.update(ano, title, contents)
-    return HttpResponseRedirect(f'/board/view?no={ano}')
+    models.update(b_no, title, contents)
+    return HttpResponseRedirect(f'/board/view?no={b_no}')
 
 
 def deleteform(request):
@@ -97,7 +106,7 @@ def deleteform(request):
 
     no = request.GET['no']
     result = models.listbyno(no)
-    if result['bno'] is not authuser['no']:
+    if result['u_no'] is not authuser['no']:
         return HttpResponseRedirect('/')
 
     return render(request, 'board/deleteform.html')
@@ -137,8 +146,8 @@ def reply(request):
         return HttpResponseRedirect('/user/loginform')
 
     user_no = authuser['no']  # 'no' = user_no
-    ano = request.POST['post_id']
-    result = models.listbyno(ano)
+    b_no = request.POST['post_id']
+    result = models.listbyno(b_no)
     title = request.POST['title']
     contents = request.POST['content']
     g_no = result['g_no']

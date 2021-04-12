@@ -28,14 +28,14 @@
 							{% if post.depth > 0 %}
 								<img src="/assets/images/reply.png" width = 20px; height=20px>
 							{% endif %}
-							<a href="/board/view?no={{ post.ano }}"> {{post.title}}</a>
+							<a href="/board/view?no={{ post.b_no }}"> {{post.title}}</a>
 						</td>
 						<td>{{post.name}}</td>
 						<td>{{post.hit}}</td>
-						<td>{{post.reg_rate }}</td> <!-- | date: 'Y-m-d H:i:s' -->
+						<td>{{post.regdate }}</td> <!-- | date: 'Y-m-d H:i:s' -->
 						<td>
-							{% if post.bno == request.session.authuser.no %}
-								<a href="/board/deleteform?no={{ post.ano }}" class="del">삭제</a>
+							{% if post.u_no == request.session.authuser.no %}
+								<a href="/board/deleteform?no={{ post.b_no }}" class="del">삭제</a>
 							{% endif %}
 						</td>
 					</tr>
@@ -46,18 +46,18 @@
 				<!-- pager 추가 : for 문 돌리기 -->
 				<div class="pager">
 					<ul>
-						<li><a href="/board?p={{paginator.prvpage}} & kwd = {{ keyword }}">◀</a></li>
+						<li><a href="/board?p={{paginator.prvpage}} ">◀</a></li>
 						{% for i in paginator.paging %}
 							{% if paginator.curpage == i %}
 								<li class="selected">{{i}}</li>
 							{% elif i > paginator.pagecount %}
 								<li>{{i}}</li>
 							{% else %}
-								<li><a href="/board?p={{i}} & kwd = {{keyword}}">{{i}}</a></li>
+								<li><a href="/board?p={{i}}">{{i}}</a></li>
 							{% endif %}
 						{% endfor %}
 
-						<li><a href="/board?p={{paginator.nextpage}} & kwd = {{keyword}}">▶</a></li>
+						<li><a href="/board?p={{paginator.nextpage}} ">▶</a></li>
 					</ul>
 				</div>
 
