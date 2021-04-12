@@ -13,18 +13,18 @@
 						</tr>
 						<tr>
 							<td class="label">제목</td>
-							<td><input type="text" name="title" value="{{oneboard.title}}"></td>
+							<td><input type="text" name="title" value="{{ result.title }}"></td>
 						</tr>
 						<tr>
 							<td class="label">내용</td>
 							<td>
-								<textarea id="content" name="content">{{oneboard.contents}}
+								<textarea id="content" name="content">{{ result.contents }}
 								</textarea>
 							</td>
 						</tr>
 					</table>
 					<div class="bottom">
-						<a href="/board/view?no={{ oneboard.no }}">취소</a>
+						<a href="/board/view?no={{ result.no }}">취소</a>
 						<input type="submit" value="수정">
 					</div>
 				</form>				

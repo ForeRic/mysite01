@@ -21,23 +21,21 @@
 						<th>작성일</th>
 						<th>&nbsp;</th>
 					</tr>				
-					{% for oneboard in boardlist %}
+					{% for post in post_list %}
 					<tr>
-						<td>{{ oneboard.no }}</td> <!-- | sub: forloop.counter | add:1 -->
-						<td style="text-align:left; padding-left:{{30|mul:oneboard.depth}}px">
-							{% if oneboard.depth > 0 %}
+						<td>{{ post.list | length | sub:forloop.counter | add:1 }}</td> <!-- | sub: forloop.counter | add:1 -->
+						<td style="text-align:left; padding-left:{{30|mul:post.depth}}px">
+							{% if post.depth > 0 %}
 								<img src="/assets/images/reply.png" width = 20px; height=20px>
 							{% endif %}
-							<a href="/board/view?no={{ onboard.no }}"> {{oneboard.title}}</a>
+							<a href="/board/view?no={{ post.ano }}"> {{post.title}}</a>
 						</td>
-						<td>{{oneboard.name}}</td>
-						<td>{{oneboard.hit}}</td>
-						<td>{{oneboard.reg_rate }}</td> <!-- | date: 'Y-m-d H:i:s' -->
+						<td>{{post.name}}</td>
+						<td>{{post.hit}}</td>
+						<td>{{post.reg_rate }}</td> <!-- | date: 'Y-m-d H:i:s' -->
 						<td>
-							{% if request.seesion.authuser is not None %}
-								{% if oneboard.no == request.session.authuser.no %}
-									<a href="/board/delete?no={{ oneboard.no }}" class="del">삭제</a>
-								{% endif %}
+							{% if post.bno == request.session.authuser.no %}
+								<a href="/board/deleteform?no={{ post.ano }}" class="del">삭제</a>
 							{% endif %}
 						</td>
 					</tr>
@@ -66,7 +64,7 @@
 				<!-- pager 추가 -->
 				
 				<div class="bottom">
-					{% if reqeust.session.authuser.no is not None %}
+					{% if reqeust.session.authuser.no != None %}
 						<a href="/board" id="new-book">글쓰기</a>
 					{% endif %}
 				</div>				

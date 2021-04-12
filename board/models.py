@@ -1,3 +1,191 @@
+from MySQLdb import connect, OperationalError
+from MySQLdb.cursors import DictCursor
+
+
+def boardlist():
+    try:
+        db = conn()
+        cursor = db.cursor(DictCursor)
+
+        sql = '''
+          select a.no as ano, 
+                 b.no as bno, 
+                 title, 
+                 name, 
+                 hit, 
+                 reg_date as regdate, 
+                 depth
+            from board a, user b
+           where a.user_no = b.no
+        order by g_no desc, o_no asc, depth asc'''
+        cursor.execute(sql)
+
+        results = cursor.fetchall()
+
+        cursor.close()
+        db.close()
+
+        return results
+
+    except OperationalError as e:
+        print(f'error: {e}')
+
+
+def insert_post(title, contents, user_no):
+    try:
+        # 연결
+        db = conn()
+
+        # cursor 생성
+        cursor = db.cursor()
+
+        # SQL 실행 / now(), g_no = ifnull((select max(g_no) from board as a),0)+1
+        sql = '''insert into board values(
+        null, %s, %s, 0, now(), ifnull((select max(g_no) from board as a),0)+1, 1, 0, %s)'''
+        cursor.execute(sql, (title, contents, user_no))
+
+        # commit
+        db.commit()
+
+        # 자원 정리
+        cursor.close()
+        db.close()
+
+    except OperationalError as e:
+        print(f'error: {e}')
+
+
+def insert_reply(title, contents, g_no, depth, user_no):
+    try:
+        # 연결
+        db = conn()
+
+        # cursor 생성
+        cursor = db.cursor()
+
+        # SQL 실행 / now(), g_no = ifnull((select max(g_no) from board as a),0)+1
+        sql = "insert into board values(null, %s, %s, 0, now(), %s, (select max(o_no) from board as a)+1, %s, %s)"
+        cursor.execute(sql, (title, contents, g_no, depth, user_no))
+
+        # commit
+        db.commit()
+
+        # 자원 정리
+        cursor.close()
+        db.close()
+
+    except OperationalError as e:
+        print(f'error: {e}')
+
+
+def listbyno(no):
+    try:
+        db = conn()
+        cursor = db.cursor(DictCursor)
+
+        sql = '''
+          select a.no as ano,
+                 b.no as bno, 
+                 title, 
+                 contents, 
+                 name, 
+                 hit, 
+                 reg_date as regdate, g_no, o_no, depth
+            from board a, user b
+           where a.user_no = b.no
+             and a.no = %s'''
+        cursor.execute(sql, (no,))
+
+        result = cursor.fetchone()
+
+        cursor.close()
+        db.close()
+
+        return result
+
+    except OperationalError as e:
+        print(f'error: {e}')
+
+
+def deletebyno(no):
+    try:
+        db = conn()
+        cursor = db.cursor()
+
+        sql = 'delete from board where no = %s'
+        cursor.execute(sql, (no,))
+
+        db.commit()
+
+        cursor.close()
+        db.close()
+
+    except OperationalError as e:
+        print(f'error: {e}')
+
+
+def findby_no_and_ps(ano, password):
+    try:
+        db = conn()
+        cursor = db.cursor(DictCursor)
+        sql = '''
+        select b.no as bno, name, email, gender
+          from board a, user b
+         where a.user_no = b.no
+           and a.no = %s
+           and password = %s'''
+        cursor.execute(sql, (ano, password))
+
+        result = cursor.fetchone()
+
+        cursor.close()
+        db.close()
+
+        return result
+    except OperationalError as e:
+        print(f'error: {e}')
+
+
+def update(ano, title, contents):
+    try:
+        db = conn()
+        cursor = db.cursor()
+
+        sql = '''
+        update board
+           set title = %s, contents = %s
+         where no = %s'''
+        cursor.execute(sql, (title, contents, ano))
+
+        db.commit()
+
+        cursor.close()
+        db.close()
+
+        print("ok")
+    except OperationalError as e:
+        print(f'error: {e}')
+
+
+def conn():
+    return connect(
+        user='webdb',
+        password='webdb',
+        host='localhost',
+        port=3306,
+        db='webdb',
+        charset='utf8')
+
+
+
+
+
+'--------------------------------------------------------------'
+
+
+
+#  공부용 분석
+
 '''
 from MySQLdb import connect, OperationalError
 from MySQLdb.cursors import DictCursor
@@ -302,6 +490,7 @@ def count():
         print(f'error: {e}')
 '''
 
+'''
 from MySQLdb import connect
 from MySQLdb.cursors import DictCursor
 from django.db import OperationalError
@@ -325,7 +514,7 @@ def boardlist():
         cursor = db.cursor(DictCursor)
 
         # SQL 실행
-        sql = '''
+        sql = '
         select  a.name, 
                 b.no, 
                 b.title, 
@@ -336,7 +525,7 @@ def boardlist():
            from user a, board b 
           where a.no = b.user_no 
         order by b.g_no desc, b.o_no asc
-        '''
+        '
         cursor.execute(sql)
 
         # 결과 받아오기
@@ -362,7 +551,7 @@ def getboard(no):
         cursor = db.cursor(DictCursor)
 
         # SQL 실행
-        sql = '''
+        sql = '
         select  a.name, 
                 b.title, 
                 b.contents, 
@@ -374,7 +563,7 @@ def getboard(no):
            from user a, board b
           where b.user_no = a.no
             and b.no = %s
-        '''
+        '
         cursor.execute(sql, (no,))
 
         # 결과 받아오기
@@ -400,10 +589,10 @@ def insert(title, content, user_no):
         cursor = db.cursor()
 
         # SQL
-        sql = '''
+        sql = '
         insert into board values 
         (null, %s, %s, 0, now(),
-        ifnull((select no from(select max(g_no) as no from board) as board_case), 0) + 1, 1, 0, %s, 0)'''
+        ifnull((select no from(select max(g_no) as no from board) as board_case), 0) + 1, 1, 0, %s, 0)'
 
         cnt = cursor.execute(sql, (title, content, user_no))
 
@@ -509,13 +698,13 @@ def insertreply(title, content, original_g_no, original_o_no, depth, user_no):
         cursor = db.cursor()
 
         # SQL
-        sql = '''insert into board(
+        sql = 'insert into board(
                             no, title, contents, user_no, hit, reg_date, 
                             g_no, o_no, depth
                         ) values(
                             null, %s, %s, %s, 0, now(),
                             %s, %s, %s 
-                        )'''
+                        )'
         cnt = cursor.execute(sql, (title, content, user_no, original_g_no, original_o_no, depth))
 
         # commit
@@ -543,7 +732,7 @@ def search(keyword):
         keyword = "%" + keyword + "%"
 
         # SQL 실행
-        sql = '''
+        sql = '
         select  a.name,
                 b.no, 
                 b.title, 
@@ -555,7 +744,7 @@ def search(keyword):
           where a.no=b.user_no
             and (b.title like %s or b.contents like %s)
         order by b.g_no desc, b.o_no asc
-        '''
+        '
         cursor.execute(sql, (keyword,))
 
         # 결과 받아오기
@@ -594,3 +783,4 @@ def count():
 
     except OperationalError as e:
         print(f'error: {e}')
+'''

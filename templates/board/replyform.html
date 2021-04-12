@@ -6,7 +6,7 @@
 			<div id="board">
 				<form class="board-form" method="post" action="/board/reply">
 					{% csrf_token %}
-					<input type="hidden" name="original_boardno" value="{{ reqeust.GET.no }}">
+					<input type="hidden" name="post_id" value="{{ reqeust.GET.no }}">
 
 					<table class="tbl-ex">
 						<tr>
@@ -19,12 +19,12 @@
 						<tr>
 							<td class="label">내용</td>
 							<td>
-								<textarea id="content" name="contents"></textarea>
+								<textarea id="content" name="content"></textarea>
 							</td>
 						</tr>
 					</table>
 					<div class="bottom">
-						<a href="/board">취소</a>
+						<a href="/board/view?no={{ request.GET.no }}">취소</a>
 						<input type="submit" value="등록">
 					</div>
 				</form>

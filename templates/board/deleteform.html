@@ -1,0 +1,23 @@
+{% extends '../base.html %} <!-- 한칸 위 디렉토리로 올라갈때는 ../ 이고 현재위치는 .(점) -->
+
+{% block css_link %}
+<link href="/assets/css/guestbook.css" rel="stylesheet" type="text/css">
+{% endblock %}
+
+		{% block content %}
+			<div id="guestbook" class="delete-form">
+				<form method="post" action="/board/delete">
+					{% csrf_token %}
+					<input type='hidden' name="post_id" value="{{ request.GET.no }}">
+					<label>비밀번호</label>
+					<input type="password" name="password">
+					<input type="submit" value="확인">
+					{% if request.GET.result == 'fail' %}
+					<p>
+						로그인에 실패 했습니다.
+					</p>
+					{% endif %}
+				</form>
+				<a href="/board">돌아가기</a>
+			</div>
+		{% endblock %}
